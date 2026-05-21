@@ -1,33 +1,55 @@
 package borrow_service;
+
+import borrow_service.entity.Borrow;
+import borrow_service.repository.BorrowRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
-import java.util.HashMap;
+
 @RestController
 @RequestMapping("/borrow")
-
 public class BorrowController {
-    private RestTemplate restTemplate = new RestTemplate();
+
+    private final RestTemplate restTemplate = new RestTemplate();
+    private final BorrowRepository repository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    public BorrowController(
+            BorrowRepository repository,
+            KafkaTemplate<String, String> kafkaTemplate
+    ) {
+        this.repository = repository;
+        this.kafkaTemplate = kafkaTemplate;
+    }
 
     @PostMapping
-    public Map<String, Object> borrowBook(@RequestBody Map<String, String> request) {
+    public Borrow borrowBook(@RequestBody Borrow borrow) {
 
-        String bookId = request.get("bookId");
+        String url = "http://book-service:8081/books/" + borrow.getBookId();
 
-        String url = "http://localhost:8081/books/" + bookId;
+        Map<String, Object> book = restTemplate.getForObject(url, Map.class);
 
-        Map book = restTemplate.getForObject(url, Map.class);
-
-        Map<String, Object> response = new HashMap<>();
-
-        if ((Boolean) book.get("available")) {
-            response.put("status", "success");
-            response.put("message", "Book borrowed successfully");
-        } else {
-            response.put("status", "failed");
+        // حماية من null
+        if (book == null) {
+            borrow.setStatus("FAILED");
+            return repository.save(borrow);
         }
 
-        return response;
+        Boolean available = (Boolean) book.get("available");
+
+        if (Boolean.TRUE.equals(available)) {
+
+            kafkaTemplate.send("payment-topic", "Payment Request Created");
+            kafkaTemplate.send("notification-topic", "Notification Sent");
+
+            borrow.setStatus("BORROWED");
+
+        } else {
+            borrow.setStatus("FAILED");
+        }
+
+        return repository.save(borrow);
     }
 }

@@ -1,19 +1,30 @@
 package book_service;
+
+import book_service.entity.Book;
+import book_service.repository.BookRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
-import java.util.HashMap;
+
 @RestController
 @RequestMapping("/books")
 public class BookController {
+
+    @Autowired
+    private BookRepository repository;
+
+    @PostMapping
+    public Book addBook(
+            @RequestBody Book book){
+
+        return repository.save(book);
+    }
+
     @GetMapping("/{id}")
-    public Map<String, Object> getBook(@PathVariable String id) {
+    public Book getBook(
+            @PathVariable String id){
 
-        Map<String, Object> book = new HashMap<>();
-        book.put("bookId", id);
-        book.put("title", "Clean Code");
-        book.put("available", true);
-        book.put("quantity", 5);
-
-        return book;
+        return repository.findById(id)
+                .orElse(null);
     }
 }

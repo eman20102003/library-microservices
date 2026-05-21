@@ -15,10 +15,10 @@
 
 	<!-- Project Info -->
 	<groupId>com.library</groupId>
-	<artifactId>book-service</artifactId>
+	<artifactId>borrow-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>book-service</name>
-	<description>Book Service</description>
+	<name>borrow-service</name>
+	<description>Borrow Service</description>
 
 	<!-- Java Version -->
 	<properties>
@@ -39,6 +39,42 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>
+				org.springframework.boot
+			</groupId>
+
+			<artifactId>
+				spring-boot-starter-data-jpa
+			</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.mysql</groupId>
+
+			<artifactId>
+				mysql-connector-j
+			</artifactId>
+
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>
+				org.springframework.kafka
+			</groupId>
+
+			<artifactId>
+				spring-kafka
+			</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.library</groupId>
+			<artifactId>book-service</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>

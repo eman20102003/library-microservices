@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Book Service
+        run: |
+          cd book-service
+          mvn clean install -DskipTests
+
+      - name: Build Borrow Service
+        run: |
+          cd borrow-service
+          mvn clean install -DskipTests
+
+      - name: Build Customer Service
+        run: |
+          cd customer-service
+          mvn clean install -DskipTests
+
+      - name: Build Payment Service
+        run: |
+          cd payment-service
+          mvn clean install -DskipTests
+
+      - name: Build Notification Service
+        run: |
+          cd notification-service
+          mvn clean install -DskipTests
